@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="createAppointment" doc:id="1fa58d6b-e1f9-459d-8be5-191d53082e37" >
+		<db:insert doc:name="appointment" doc:id="4ef4dacd-7791-4763-a893-6c727261aedb" config-ref="practiceMgmtDbConfig" target="insertResult">
+			<db:sql ><![CDATA[INSERT INTO appointment(
+  created_at,
+  scheduled_start,
+  description,
+  pat_id,
+  fac_id
+) VALUES ( 
+  :created, 
+  :start, 
+  :description, 
+  :patientId, 
+  :facilityId
+)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	created: now(),
+	start: payload.appointment.start,
+	description: payload.appointment.description,
+	patientId: payload.patient.id,
+	facilityId: payload.facility.id
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="response" doc:id="81870c71-2796-4329-8656-19337e4f755a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{ id: 0 } ++ payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
