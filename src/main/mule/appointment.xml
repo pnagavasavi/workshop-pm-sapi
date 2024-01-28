@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="createAppointment" doc:id="1fa58d6b-e1f9-459d-8be5-191d53082e37" >
-		<db:insert doc:name="appointment" doc:id="4ef4dacd-7791-4763-a893-6c727261aedb" config-ref="practiceMgmtDbConfig" target="insertResult">
+		<db:insert doc:name="appointment" doc:id="4ef4dacd-7791-4763-a893-6c727261aedb" config-ref="practiceMgmtDbConfig" target="insertResult" autoGenerateKeys="true">
 			<db:sql ><![CDATA[INSERT INTO appointment(
   created_at,
   scheduled_start,
@@ -33,7 +33,48 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-{ id: 0 } ++ payload]]></ee:set-payload>
+{ id: vars.insertResult.generatedKeys.GENERATED_KEY } 
+	++ payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="listAppointmentsForPatient" doc:id="ce02b036-917b-4348-af7e-bcf4da1599ba" >
+		<db:select doc:name="FROM appointment" doc:id="5b447800-2769-46ab-a273-47e1f9573f46" config-ref="practiceMgmtDbConfig">
+			<db:sql ><![CDATA[SELECT 
+	a.app_id, 
+	a.created_at, 
+	a.scheduled_start, 
+	a.scheduled_end, 
+	a.description, 
+	f.fac_id,
+	f.name facility_name
+FROM appointment a JOIN facility f ON a.fac_id = f.fac_id
+WHERE a.pat_id = :patientId
+	]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	patientId: vars.patientId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="response" doc:id="a1c738bb-91fb-4280-a09e-acb73452305a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (row) -> {
+	patient: {
+		id: vars.patientId
+	},
+	facility: {
+		id: row.fac_id,
+		name: row.facility_name
+	},
+	appointment: {
+		id: row.app_id,
+		start: row.scheduled_start,
+		end: row.scheduled_end,
+		description: row.description
+	}
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>

@@ -4,6 +4,11 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="listAppointmentsFlow" doc:id="7a662057-b9e0-46f3-8469-8b8fe7e8becc" >
+		<http:listener doc:name="GET /patients/{id}/appointments" doc:id="0d2dfcb8-f499-4d71-b0ec-bde292a0140f" config-ref="httpListenerConfig" path="/patients/{id}/appointments"/>
+		<set-variable value="#[attributes.uriParams.id]" doc:name="patientId" doc:id="897aa070-049b-4849-98bd-d25425e0590f" variableName="patientId"/>
+		<flow-ref doc:name="listAppointmentsForPatient" doc:id="01438966-a5f1-49fb-a0d9-f49e16cc1b01" name="listAppointmentsForPatient"/>
+	</flow>
 	<flow name="postAppointmentFlow" doc:id="a1376ef5-024b-4e7d-84de-705948d71a84" >
 		<http:listener doc:name="POST /appointments" doc:id="ad587a6e-3e20-434e-b9b5-8ad12c4a2648" config-ref="httpListenerConfig" path="/appointments" allowedMethods="POST"/>
 		<flow-ref doc:name="createAppointment" doc:id="930c2728-14e7-4dc5-8c7c-2babc45f6ade" name="createAppointment"/>

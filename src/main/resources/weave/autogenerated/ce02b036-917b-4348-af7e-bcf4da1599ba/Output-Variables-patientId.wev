@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_ce02b036_917b_4348_af7e_bcf4da1599ba_Output_Variables_patientId = String | Null
+
