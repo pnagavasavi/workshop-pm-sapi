@@ -4,13 +4,32 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<flow name="listAppointmentsFlow" doc:id="7a662057-b9e0-46f3-8469-8b8fe7e8becc" >
-		<http:listener doc:name="GET /patients/{id}/appointments" doc:id="0d2dfcb8-f499-4d71-b0ec-bde292a0140f" config-ref="httpListenerConfig" path="/patients/{id}/appointments"/>
+	<flow name="listAppointmentsApiFlow" doc:id="7a662057-b9e0-46f3-8469-8b8fe7e8becc" >
+		<http:listener doc:name="GET /patients/{id}/appointments" doc:id="0d2dfcb8-f499-4d71-b0ec-bde292a0140f" config-ref="httpListenerConfig" path="/patients/{id}/appointments">
+			<http:error-response statusCode="#[vars.httpStatus default 500]" />
+		</http:listener>
 		<set-variable value="#[attributes.uriParams.id]" doc:name="patientId" doc:id="897aa070-049b-4849-98bd-d25425e0590f" variableName="patientId"/>
 		<flow-ref doc:name="listAppointmentsForPatient" doc:id="01438966-a5f1-49fb-a0d9-f49e16cc1b01" name="listAppointmentsForPatient"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="f7d9c4c3-4b74-40c0-9897-5ed52d39723a" type="APP:INVALID_PATIENT">
+				<set-variable value="404" doc:name="httpStatus = 404" doc:id="b9a9b20c-c9a5-4430-91a0-4c0c60663037" variableName="httpStatus"/>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
-	<flow name="postAppointmentFlow" doc:id="a1376ef5-024b-4e7d-84de-705948d71a84" >
+	<flow name="postAppointmentApiFlow" doc:id="a1376ef5-024b-4e7d-84de-705948d71a84" >
 		<http:listener doc:name="POST /appointments" doc:id="ad587a6e-3e20-434e-b9b5-8ad12c4a2648" config-ref="httpListenerConfig" path="/appointments" allowedMethods="POST"/>
 		<flow-ref doc:name="createAppointment" doc:id="930c2728-14e7-4dc5-8c7c-2babc45f6ade" name="createAppointment"/>
+	</flow>
+	<flow name="deleteAppointmentsApiFlow" doc:id="cac26464-7b9d-4f9c-89e8-6fdfe49707b9" >
+		<http:listener doc:name="DELETE /appointments/{id}" doc:id="522e6b68-167d-4473-bfa4-e7926ee57c7f" config-ref="httpListenerConfig" path="/appointments/{id}">
+			<http:error-response statusCode="#[vars.httpStatus default 500]" />
+		</http:listener>
+		<set-variable value="#[attributes.uriParams.id]" doc:name="appointmentId" doc:id="cd607f00-c5e2-4e42-873f-2bc2d7156901" variableName="appointmentId"/>
+		<flow-ref doc:name="deleteAppointment" doc:id="5f0dc951-7680-4216-9d42-cdbe2f023a91" name="deleteAppointment"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="b075db74-9783-4417-863f-82fb133fb030" type="APP:INVALID_APPOINTMENT">
+				<set-variable value="404" doc:name="httpStatus = 404" doc:id="807fcb6c-aa7a-45cb-8cc7-8292c7dce11f" variableName="httpStatus"/>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>

@@ -2,4 +2,5 @@ db:
   host: devdb.integrationcity.dev
   port: "25060"
   database: iqhealth
-  user: mule
+  user: youruser
+  password: yourpassword

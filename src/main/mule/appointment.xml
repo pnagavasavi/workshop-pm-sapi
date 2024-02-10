@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="10056e34-f45b-440d-a677-d613a6f544f9" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
 	<flow name="createAppointment" doc:id="1fa58d6b-e1f9-459d-8be5-191d53082e37" >
 		<db:insert doc:name="appointment" doc:id="4ef4dacd-7791-4763-a893-6c727261aedb" config-ref="practiceMgmtDbConfig" target="insertResult" autoGenerateKeys="true">
+			<error-mapping sourceType="DB:CONNECTIVITY" targetType="APP:CONNECTIVITY" />
 			<db:sql ><![CDATA[INSERT INTO appointment(
   created_at,
   scheduled_start,
@@ -38,7 +44,31 @@ output application/json
 			</ee:message>
 		</ee:transform>
 	</flow>
+	<flow name="deleteAppointment" doc:id="db59e77a-112b-4113-aa31-3d59487ca283" >
+		<db:update doc:name="appointment" doc:id="4c735450-3d73-4fa1-b955-68c0756b79cb" config-ref="practiceMgmtDbConfig">
+			<db:sql ><![CDATA[UPDATE appointment
+SET status_id = 3 -- cancelled
+WHERE app_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: vars.appointmentId
+}]]]></db:input-parameters>
+		</db:update>
+		<validation:is-number numberType="INTEGER" doc:name="one row affected" doc:id="03b7937f-a1b6-4141-99f0-e7ffd3e32690" value="#[payload.affectedRows]" minValue="#[1]" maxValue="#[1]">
+			<error-mapping sourceType="VALIDATION:INVALID_NUMBER" targetType="APP:INVALID_APPOINTMENT" />
+		</validation:is-number>
+	</flow>
 	<flow name="listAppointmentsForPatient" doc:id="ce02b036-917b-4348-af7e-bcf4da1599ba" >
+		<db:select doc:name="patient" doc:id="05ea2e95-659b-4b2c-9ff2-3282c2515db8" config-ref="practiceMgmtDbConfig">
+			<db:sql ><![CDATA[SELECT pat_id
+FROM patient
+WHERE pat_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: vars.patientId
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-empty-collection doc:name="patient exists" doc:id="f640fe7a-5995-4569-bf78-e1a426a7b97e" message='#["patient $(vars.patientId) not found"]'>
+			<error-mapping sourceType="VALIDATION:EMPTY_COLLECTION" targetType="APP:INVALID_PATIENT" />
+		</validation:is-not-empty-collection>
 		<db:select doc:name="FROM appointment" doc:id="5b447800-2769-46ab-a273-47e1f9573f46" config-ref="practiceMgmtDbConfig">
 			<db:sql ><![CDATA[SELECT 
 	a.app_id, 
@@ -47,8 +77,11 @@ output application/json
 	a.scheduled_end, 
 	a.description, 
 	f.fac_id,
-	f.name facility_name
-FROM appointment a JOIN facility f ON a.fac_id = f.fac_id
+	f.name facility_name,
+	s.name status
+FROM appointment a 
+	JOIN facility f ON a.fac_id = f.fac_id
+	JOIN appointment_status s ON a.status_id = s.sta_id
 WHERE a.pat_id = :patientId
 	]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
@@ -77,5 +110,35 @@ payload map (row) -> {
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+	</flow>
+	<flow name="appointmentFlow" doc:id="18cafb45-69c9-455f-a521-317b24654f5e" >
+		<scheduler doc:name="Scheduler" doc:id="74201a55-fbf7-4402-8b67-64afe80e69ba" >
+			<scheduling-strategy >
+				<fixed-frequency timeUnit="HOURS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Transform Message" doc:id="e5dc0dd5-b477-44d6-ae89-73fc76b01cc0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var appts = readUrl("classpath://appointments.json", "application/json").data
+---
+appts map {
+	patient: {
+		id: $.patient
+	},
+	facility: {
+		id: $.facility
+	},
+	appointment: {
+		start: $.start,
+		description: $.description
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="a78924df-8d84-4762-ac81-42a0c1a5cfe0" >
+			<http:request method="POST" doc:name="Request" doc:id="4b07e901-0a7f-487a-b8ca-b83d22880670" config-ref="HTTP_Request_configuration" path="/appointments"/>
+		</foreach>
 	</flow>
 </mule>
