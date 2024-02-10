@@ -111,34 +111,4 @@ payload map (row) -> {
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="appointmentFlow" doc:id="18cafb45-69c9-455f-a521-317b24654f5e" >
-		<scheduler doc:name="Scheduler" doc:id="74201a55-fbf7-4402-8b67-64afe80e69ba" >
-			<scheduling-strategy >
-				<fixed-frequency timeUnit="HOURS"/>
-			</scheduling-strategy>
-		</scheduler>
-		<ee:transform doc:name="Transform Message" doc:id="e5dc0dd5-b477-44d6-ae89-73fc76b01cc0" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
-var appts = readUrl("classpath://appointments.json", "application/json").data
----
-appts map {
-	patient: {
-		id: $.patient
-	},
-	facility: {
-		id: $.facility
-	},
-	appointment: {
-		start: $.start,
-		description: $.description
-	}
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<foreach doc:name="For Each" doc:id="a78924df-8d84-4762-ac81-42a0c1a5cfe0" >
-			<http:request method="POST" doc:name="Request" doc:id="4b07e901-0a7f-487a-b8ca-b83d22880670" config-ref="HTTP_Request_configuration" path="/appointments"/>
-		</foreach>
-	</flow>
 </mule>
