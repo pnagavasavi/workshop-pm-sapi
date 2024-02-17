@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="list-appointments-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given patient id, Verify the patient exists.&#10;2. Given valid patient id, Verify the response contains list of appointments.&#10;3. Given valid patient id, Verify the response as per the defined schema&#10;4. Given invalid patient id, Verify the the response status code "/>
+	<munit:test name="list-appointments-test-suiteTest" doc:id="cb12a199-c831-4ce0-bb43-18c42934a5fb" />
+
+</mule>

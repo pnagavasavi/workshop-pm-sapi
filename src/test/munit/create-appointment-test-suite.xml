@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="create-appointment-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given valid payload, Verify appointment is creted or not.&#10;2. Verify schedule date in request date is futute  or not.&#10;3. Given valid payload and appoinment created, Verify the insertResult variable contains generated key.&#10;4. Given valid payload and appoinment created, Verify the response to user contains generated key ++ payload or not.&#10;5. Verify the responses when an invalid payload is sent"/>
+	<munit:test name="create-appointment-test-suiteTest" doc:id="bc0f28ac-cdb2-4e5a-ac21-f73ba312e192" />
+
+</mule>
