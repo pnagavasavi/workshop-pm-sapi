@@ -8,7 +8,16 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 	<munit:config name="delete-appointment-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given valid patient id, Verify only one row is effected&#10;2. Given valid patient id, Verify the correct status is updated in table&#10;3. Given invalid patient id, Verify the response status code &#10;4. Given invalid patient id, Verify the response payload&#10;5. Given empty patient id, Verify the response status code&#10;6. Given empty patient id, Verify the response payload"/>
-	<munit:test name="verify-only-one-row-deleted" doc:id="2392e2d9-3107-4c7f-afbf-e8b6921d921f" doc:description="This test verifies, only one row is deleted when valid patient id is sent"/>
+	<munit:test name="verify-only-one-row-deleted" doc:id="2392e2d9-3107-4c7f-afbf-e8b6921d921f" doc:description="This test verifies, only one row is deleted when valid patient id is sent">
+		<munit:execution >
+			<set-variable value="362" doc:name="Set Variable" doc:id="169eefc9-e403-4974-8288-356ee5ad9f00" variableName="appointmentId"/>
+			<flow-ref doc:name="deleteAppointment" doc:id="c2b247d7-ace5-4e1a-a521-65815cf3aaf6" name="deleteAppointment"/>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="eaa84eb0-fdd5-4efc-8bf6-d398fcb2a483" message="#[payload]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="8145323c-d486-46e9-ab9a-30340f53c194" actual="#[payload.affectedRows]" expected="1"/>
+		</munit:validation>
+	</munit:test>
 	<munit:test name="verify-status-in-table" doc:id="c05f04ea-eb85-49d2-abb3-f6ec32b18a14" doc:description="This test verifies, the status is updated correctly when valid patient id is sent" />
 	<munit:test name="verify-response-status-code-with-invalid-patient-id" doc:id="ece7d12b-68f4-4e64-99cd-ea861e3c108a" doc:description="This test verifies, response status code when invalid patient id is sent" />
 	<munit:test name="verify-response-with-invalid-patient-id" doc:id="163256bf-ffc3-4f8b-a249-927822021f14" doc:description="This test verifies, response payload when invalid patient id is sent" />

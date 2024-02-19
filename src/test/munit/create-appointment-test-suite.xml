@@ -1,21 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xsi:schemaLocation="
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<munit:config name="create-appointment-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given valid payload, Verify appointment is creted or not.&#10;2. Verify schedule date in request date is futute  or not.&#10;3. Given valid payload and appoinment created, Verify the insertResult variable contains generated key.&#10;4. Given valid payload and appoinment created, Verify the response to user contains generated key ++ payload or not.&#10;5. Verify the responses when an invalid payload is sent.&#10;6. Verify the response when schedule date is past.&#10;7. Verify when empty request payload is sent.&#10;8. Verify when no patient id is sent in request.&#10;9. Verify when no facility is sent in request."/>
-	<munit:test name="verify-appointment-created" doc:id="bc0f28ac-cdb2-4e5a-ac21-f73ba312e192" doc:description="This test verifies if the appointment is created in db."/>
-	<munit:test name="verify-future-schedule-date-in-request-payload" doc:id="34b1a179-4a42-4f10-9abc-cb397648200f" doc:description="This test verifies the response, when future scheduled date is sent in request payload."/>
-	<munit:test name="verify-past-schedule-date-in-request-payload" doc:id="725955e2-1e9e-476d-b420-117a767a45d4" doc:description="This test verifies the response, when past scheduled date is sent in request payload."/>
-	<munit:test name="verify-generated-key-in-db-result" doc:id="78bc75d1-d5c3-4d52-bd65-d716fd09699f" doc:description="This test verifies if db result contains a generated key."/>
-	<munit:test name="verify-response-payload" doc:id="7726186d-9572-4e57-ae82-3933a6a5bda3" doc:description="This test verifies the response payload as per the schema."/>
-	<munit:test name="verify-response-with-empty-request-payload" doc:id="c4bfd726-2e12-4c56-bf8a-182c776258b6" doc:description="This test verifies the response, when empty request payload is sent."/>
-	<munit:test name="verify-response-with-empty-facility-id" doc:id="166ebb54-51fa-4f63-8d08-52768bbd0f2a" doc:description="This test verifies the response, when empty facility id is sent in request payload."/>
-	<munit:test name="verify-response-with-empty-patient-id" doc:id="8a81737b-43d5-407b-bb30-58d61956ee04" doc:description="This test verifies the response, when empty patient id is sent in request payload."/>
-	<munit:test name="verify-response-with-invalid-request-payload" doc:id="fdb553e7-5964-40ff-a1bc-ad64b4683ca9" doc:description="This test verifies the response, when invalid request payload is sent."/>
+	<munit:test name="verify-appointment-created" doc:id="bc0f28ac-cdb2-4e5a-ac21-f73ba312e192" doc:description="This test verifies if the appointment is created in db." ignore="true"/>
+	<munit:test name="verify-future-schedule-date-in-request-payload" doc:id="34b1a179-4a42-4f10-9abc-cb397648200f" doc:description="This test verifies the response, when future scheduled date is sent in request payload." ignore="true"/>
+	<munit:test name="verify-past-schedule-date-in-request-payload" doc:id="725955e2-1e9e-476d-b420-117a767a45d4" doc:description="This test verifies the response, when past scheduled date is sent in request payload." ignore="true"/>
+	<munit:test name="verify-generated-key-in-db-result" doc:id="78bc75d1-d5c3-4d52-bd65-d716fd09699f" doc:description="This test verifies if db result contains a generated key.">
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="5542cd96-2979-481e-879e-7bdd905fe5ec" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	appointment : {
+		start: "2025-04-12 16:00:00",
+		description: "Test"
+	},
+	patient:{
+			id : 1
+	},
+	facility:{
+			id : 1
+	}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="84ec2968-7613-4f98-ae55-e9fda7e7a80b" name="createAppointment"/>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="6c8dae71-1078-4b03-8e56-d39ac779b697" message="#[payload]"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="a8cf6e3c-f527-467f-8afa-fcf176207748" expression="#[vars.insertResult.generatedKeys[0]]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="verify-response-payload" doc:id="7726186d-9572-4e57-ae82-3933a6a5bda3" doc:description="This test verifies the response payload as per the schema." ignore="true"/>
+	<munit:test name="verify-response-with-empty-request-payload" doc:id="c4bfd726-2e12-4c56-bf8a-182c776258b6" doc:description="This test verifies the response, when empty request payload is sent." ignore="true"/>
+	<munit:test name="verify-response-with-empty-facility-id" doc:id="166ebb54-51fa-4f63-8d08-52768bbd0f2a" doc:description="This test verifies the response, when empty facility id is sent in request payload." ignore="true"/>
+	<munit:test name="verify-response-with-empty-patient-id" doc:id="8a81737b-43d5-407b-bb30-58d61956ee04" doc:description="This test verifies the response, when empty patient id is sent in request payload." ignore="true"/>
+	<munit:test name="verify-response-with-invalid-request-payload" doc:id="fdb553e7-5964-40ff-a1bc-ad64b4683ca9" doc:description="This test verifies the response, when invalid request payload is sent." ignore="true"/>
 
 </mule>

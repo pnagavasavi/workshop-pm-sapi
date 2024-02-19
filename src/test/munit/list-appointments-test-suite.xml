@@ -14,5 +14,9 @@
 	<munit:test name="verify-response-payload-with-invalid-patient-id" doc:id="d78f78a1-2692-4fd2-8e12-a56cc3d1ff24" doc:description="This test verifies, the response schema when invalid patient id is sent" />
 	<munit:test name="verify-response-status-code-with-invalid-patientid" doc:id="f2c0e1fe-d25d-48ce-8290-9d5039593e56" doc:description="This test verifies, the response status code when invalid patient id is sent" />
 	<munit:test name="verify-error-type-with-invalid-patient-id" doc:id="d51a1da6-a5cd-414c-b9a2-f44be6a7cbec" doc:description="This test verifies, the error type when invalid patient id is sent" />
+	<munit:test name="verify-response-payload-with-empty-patientid" doc:id="e5876d6e-7565-4aa0-9006-ad379245d013" doc:description="This test verifies, the response schema when empty patient id is sent" >
+	</munit:test>
+	<munit:test name="verify-response-status-code-with-empty-patientid" doc:id="63d80a34-3238-49e0-a86d-b479a2cca157" doc:description="This test verifies, the response status code when empty patient id is sent" />
+	<munit:test name="verify-error-type-with-empty-patientid" doc:id="34a6bad0-30d8-4b85-8a9d-be68a147832b" doc:description="This test verifies, the error type when empty patient id is sent" />
 
 </mule>
