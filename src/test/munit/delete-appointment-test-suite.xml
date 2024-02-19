@@ -7,7 +7,12 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
-	<munit:config name="delete-appointment-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given valid patient id, Verify only one row is effected&#10;2. Given valid patient id, Verify the correct status is updated in table&#10;3. Given invalid patient id, Verify the the response status code "/>
-	<munit:test name="delete-appointment-test-suiteTest" doc:id="2392e2d9-3107-4c7f-afbf-e8b6921d921f" />
+	<munit:config name="delete-appointment-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given valid patient id, Verify only one row is effected&#10;2. Given valid patient id, Verify the correct status is updated in table&#10;3. Given invalid patient id, Verify the response status code &#10;4. Given invalid patient id, Verify the response payload&#10;5. Given empty patient id, Verify the response status code&#10;6. Given empty patient id, Verify the response payload"/>
+	<munit:test name="verify-only-one-row-deleted" doc:id="2392e2d9-3107-4c7f-afbf-e8b6921d921f" doc:description="This test verifies, only one row is deleted when valid patient id is sent"/>
+	<munit:test name="verify-status-in-table" doc:id="c05f04ea-eb85-49d2-abb3-f6ec32b18a14" doc:description="This test verifies, the status is updated correctly when valid patient id is sent" />
+	<munit:test name="verify-response-status-code-with-invalid-patient-id" doc:id="ece7d12b-68f4-4e64-99cd-ea861e3c108a" doc:description="This test verifies, response status code when invalid patient id is sent" />
+	<munit:test name="verify-response-with-invalid-patient-id" doc:id="163256bf-ffc3-4f8b-a249-927822021f14" doc:description="This test verifies, response payload when invalid patient id is sent" />
+	<munit:test name="verify-response-status-code-with-empty-patient-id" doc:id="51661071-1671-4060-84ab-a2c61edd3c02" doc:description="This test verifies, response status code when empty patient id is sent" />
+	<munit:test name="verify-response-payload-with-empty-patient-id" doc:id="26eaf0b4-fd20-458e-aad9-0928e805a8d7" doc:description="This test verifies, response payload when empty patient id is sent" />
 
 </mule>

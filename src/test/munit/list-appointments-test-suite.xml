@@ -7,7 +7,12 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
-	<munit:config name="list-appointments-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given patient id, Verify the patient exists.&#10;2. Given valid patient id, Verify the response contains list of appointments.&#10;3. Given valid patient id, Verify the response as per the defined schema&#10;4. Given invalid patient id, Verify the the response status code "/>
-	<munit:test name="list-appointments-test-suiteTest" doc:id="cb12a199-c831-4ce0-bb43-18c42934a5fb" />
+	<munit:config name="list-appointments-test-suite.xml" doc:description="As part of this test suite I would like to test below scenarios&#10;&#10;1. Given patient id, Verify the patient exists.&#10;2. Given valid patient id, Verify the response contains list of appointments.&#10;3. Given valid patient id, Verify the response as per the defined schema&#10;4. Given invalid patient id, Verify the the response status code &#10;5. Given patient id, Verify the response payload when patient does not exist&#10;6. Given patient id, Verify error type when patient does not exist&#10;&#10;"/>
+	<munit:test name="verify-patient-exists" doc:id="cb12a199-c831-4ce0-bb43-18c42934a5fb" doc:description="This test verifies, if the patient exists in table"/>
+	<munit:test name="verify-appointment-list-with-valid-patient-id" doc:id="95480368-b668-402d-8713-eb919457922e" doc:description="This test verifies, the list of appointments when valid patient id is sent" />
+	<munit:test name="verify-response-schema-with-valid-patient-id" doc:id="01bbb67d-94e0-4b67-b5ef-161988ad25d5" doc:description="This test verifies, the response schema when valid patient id is sent" />
+	<munit:test name="verify-response-payload-with-invalid-patient-id" doc:id="d78f78a1-2692-4fd2-8e12-a56cc3d1ff24" doc:description="This test verifies, the response schema when invalid patient id is sent" />
+	<munit:test name="verify-response-status-code-with-invalid-patientid" doc:id="f2c0e1fe-d25d-48ce-8290-9d5039593e56" doc:description="This test verifies, the response status code when invalid patient id is sent" />
+	<munit:test name="verify-error-type-with-invalid-patient-id" doc:id="d51a1da6-a5cd-414c-b9a2-f44be6a7cbec" doc:description="This test verifies, the error type when invalid patient id is sent" />
 
 </mule>
