@@ -16,6 +16,9 @@
 		<munit:validation >
 			<logger level="INFO" doc:name="Logger" doc:id="eaa84eb0-fdd5-4efc-8bf6-d398fcb2a483" message="#[payload]"/>
 			<munit-tools:assert-equals doc:name="Assert equals" doc:id="8145323c-d486-46e9-ab9a-30340f53c194" actual="#[payload.affectedRows]" expected="1"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="574d0d9c-269f-43a5-9188-6b255d472141" is="#[MunitTools::notNullValue()]" expression="#[payload.affectedRows]"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="0ba7fbd8-6828-4aea-ac4c-a6bc885b3626" expression="#[payload.affectedRows]" is="#[MunitTools::lessThan(2)]"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="96cdcd10-6bed-454f-b211-0ceb421e467e" is="#[MunitTools::greaterThan(0)]"/>
 		</munit:validation>
 	</munit:test>
 	<munit:test name="verify-status-in-table" doc:id="c05f04ea-eb85-49d2-abb3-f6ec32b18a14" doc:description="This test verifies, the status is updated correctly when valid patient id is sent" />
